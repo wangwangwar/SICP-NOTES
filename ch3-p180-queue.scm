@@ -1,0 +1,175 @@
+;;; 3.3.2 队列的表示
+;;;
+;;; 队列被表示为一对指针 front-ptr 和 rear-ptr,分别指向一个常规表中的
+;;; 第一个序对和最后一个序对。
+;;; 选择或修改队列的前端和末端指针
+(define (front-ptr queue) (car queue))
+(define (rear-ptr queue) (cdr queue))
+(define (set-front-ptr! queue item) (set-car! queue item))
+(define (set-rear-ptr! queue item) (set-cdr! queue item))
+;;; 如果前端指针为 null,则队列为空
+(define (empty-queue? queue) (null? (front-ptr queue)))
+;;; 构造函数 make-queue 返回一个初始为空的表,也就是一个序对,其 car 和
+;;; cdr 都是空表
+(define (make-queue) (cons '() '()))
+;;; 选取队列前端的数据项时,返回由前端指针指向的序对的 car
+(define (front-queue queue)
+  (if (empty-queue? queue)
+    (error "FRONT called with an empty queue" queue)
+    (car (front-ptr queue))))
+;;; 向队列中插入一个数据项,我们首先创建一个新序对,其 car 是需要插入的
+;;; 数据项,其 cdr 是空表。如果这一队列原来就是空的,那么就让队列的前端
+;;; 指针和后端指针指向这个新序对。否则就修改队列中最后一个序对,使之指向
+;;; 这个新序对,而后让队列的后端指针也指向这个新序对。
+(define (insert-queue! queue item)
+  (let ((new-pair (cons item '())))
+    (cond ((empty-queue? queue)
+           (set-front-ptr! queue new-pair)
+           (set-rear-ptr! queue new-pair)
+           queue)
+          (else
+            (set-cdr! (rear-ptr queue) new-pair)
+            (set-rear-ptr! queue new-pair)
+            queue))))
+;;; 要从队列的前端删除一个数据项,只需修改队列的前端指针,使它指向队列中
+;;; 的第二个数据项。通过队列中第一项的 cdr 指针可以找到这个项。
+(define (delete-queue! queue)
+  (cond ((empty-queue? queue)
+         (error "DELETE! called with an empty queue" queue))
+        (else
+          (set-front-ptr! queue (cdr (front-ptr queue)))
+          queue)))
+
+;;; 定义一个 print-queue,以队列为输入,打印出队列里的数据项序列。 (ex3.21)
+(define (print-queue queue)
+  (define (print-queue-iter queue-item)
+    (if (not (null? (car queue-item)))
+      (begin (display (car queue-item))
+             (display " ")
+             (if (not (null? (cdr queue-item)))
+               (print-queue-iter (cdr queue-item))
+               (display '())))))
+  (cond ((empty-queue? queue)
+         (print '()))
+        (else
+          (print-queue-iter (front-ptr queue))
+          (display "\n"))))
+
+;;; 除了用一对指针表示队列外,我们也可以将队列构造成一个带有局部状态的
+;;; 过程。这里的局部状态由指向一个常规表的开始和结束指针组成。 (ex3.22)
+(define (make-queue)
+  (let ((front-ptr '())
+        (rear-ptr '()))
+    (define (set-front-ptr! item) (set! front-ptr item))
+    (define (set-rear-ptr! item) (set! rear-ptr item))
+    (define (dispatch m)
+      (cond ((eq? m 'front-ptr) front-ptr)
+            ((eq? m 'rear-ptr) rear-ptr)
+            ((eq? m 'set-front-ptr!) set-front-ptr!)
+            ((eq? m 'set-rear-ptr!) set-rear-ptr!)))
+    dispatch))
+(define (front-ptr queue)
+  (queue 'front-ptr))
+(define (rear-ptr queue)
+  (queue 'rear-ptr))
+(define (set-front-ptr! queue item)
+  ((queue 'set-front-ptr!) item))
+(define (set-rear-ptr! queue item)
+  ((queue 'set-rear-ptr!) item))
+
+;;; 双端队列 (deque)。操作包括构造函数 make-deque,谓词 empty-deque?, 
+;;; 选择函数 front-deque, rear-deque, 改变函数 front-insert-deque!,
+;;; rear-insert-deque!, front-delete-deque!, rear-delete-deque!。
+;;; 所有操作在 O(1) 内完成。 (ex3.23)
+(define (make-deque)
+  (let ((front-ptr '())
+        (rear-ptr '()))
+    (define (set-front-ptr! item) (set! front-ptr item))
+    (define (set-rear-ptr! item) (set! rear-ptr item))
+    (define (dispatch m)
+      (cond ((eq? m 'front-ptr) front-ptr)
+            ((eq? m 'rear-ptr) rear-ptr)
+            ((eq? m 'set-front-ptr!) set-front-ptr!)
+            ((eq? m 'set-rear-ptr!) set-rear-ptr!)))
+    dispatch))
+(define (front-ptr deque)
+  (deque 'front-ptr))
+(define (rear-ptr deque)
+  (deque 'rear-ptr))
+(define (set-front-ptr! deque item)
+  ((deque 'set-front-ptr!) item))
+(define (set-rear-ptr! deque item)
+  ((deque 'set-rear-ptr!) item))
+
+(define (empty-deque? deque)
+  (null? (front-ptr deque)))
+(define (front-deque deque)
+  (if (empty-deque? deque)
+    (error "FRONT called with an empty deque" deque)
+    (car (front-ptr deque))))
+(define (rear-deque deque)
+  (if (empty-deque? deque)
+    (error "REAR called with an empty deque" deque)
+    (car (rear-ptr deque))))
+
+(define (item pair)
+  (car pair))
+(define (prev-ptr pair)
+  (cadr pair))
+(define (next-ptr pair)
+  (caddr pair))
+(define (set-prev-ptr! pair item)
+  (set-car! (cdr pair) item))
+(define (set-next-ptr! pair item)
+  (set-car! (cddr pair) item))
+
+(define (front-insert-deque! deque item)
+  (let ((new-pair (list item '() '())))
+    (cond ((empty-deque? deque)
+           (set-front-ptr! deque new-pair)
+           (set-rear-ptr! deque new-pair)
+           deque)
+          (else
+            (set-next-ptr! new-pair (front-ptr deque))
+            (set-prev-ptr! (front-ptr deque) new-pair)
+            (set-front-ptr! deque new-pair)
+            deque))))
+(define (rear-insert-deque! deque item)
+  (let ((new-pair (list item '() '())))
+    (cond ((empty-deque? deque)
+           (set-front-ptr! deque new-pair)
+           (set-rear-ptr! deque new-pair)
+           deque)
+          (else
+            (set-prev-ptr! new-pair (rear-ptr deque))
+            (set-next-ptr! (rear-ptr deque) new-pair)
+            (set-rear-ptr! deque new-pair)
+            deque))))
+(define (front-delete-deque! deque)
+  (cond ((empty-deque? deque)
+         (error "FRONT-DELETE! called with an empty deque" deque))
+        (else
+          (set-prev-ptr! (next-ptr (front-ptr deque)) '())
+          (set-front-ptr! deque (next-ptr (front-ptr deque)))
+          deque)))
+(define (rear-delete-deque! deque)
+  (cond ((empty-deque? deque)
+         (error "REAR-DELETE! called with an empty deque" deque))
+        (else
+          (set-next-ptr! (prev-ptr (rear-ptr deque)) '())
+          (set-rear-ptr! deque (prev-ptr (rear-ptr deque)))
+          deque)))
+;;; 打印双端队列
+(define (print-deque deque)
+  (define (print-deque-iter deque-item)
+    (if (not (null? (item deque-item)))
+      (begin (display (item deque-item))
+             (display " ")
+             (if (not (null? (next-ptr deque-item)))
+               (print-deque-iter (next-ptr deque-item))
+               (display '())))))
+  (cond ((empty-deque? deque)
+         (print '()))
+        (else
+          (print-deque-iter (front-ptr deque))
+          (display "\n"))))
