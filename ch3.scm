@@ -13,50 +13,50 @@
 (define balance 100)
 (define (withdraw amount)
   (if (>= balance amount)
-	(begin (set! balance (- balance amount))
-		   balance)
-	"Insufficient funds"))
+    (begin (set! balance (- balance amount))
+           balance)
+    "Insufficient funds"))
 
 ;;; 重写 withdraw 过程， balance 作为内部变量
 (define new-withdraw
   (let ((balance 100))
-	(lambda (amount)
-	  (if (>= balance amount)
-		(begin (set! balance (- balance amount))
-			   balance)
-		"Insufficient funds"))))
+    (lambda (amount)
+      (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))))
 
 ;;; 创建"提款处理器"
 (define (make-withdraw balance)
   (lambda (amount)
-	(if (>= balance amount)
-	  (begin (set! balance (- balance amount))
-			 balance)
-	  "Insufficient funds")))
+    (if (>= balance amount)
+      (begin (set! balance (- balance amount))
+             balance)
+      "Insufficient funds")))
 
 ;;; 添加存款功能，并能够选择提款或存款功能
 (define (make-account balance)
   (define (withdraw amount)
-	(if (>= balance amount)
-	  (begin (set! balance (- balance amount))
-			 balance)
-	  "Insufficient funds"))
+    (if (>= balance amount)
+      (begin (set! balance (- balance amount))
+             balance)
+      "Insufficient funds"))
   (define (deposit amount)
-	(set! balance (+ balance amount))
-	balance)
+    (set! balance (+ balance amount))
+    balance)
   (define (dispatch m)
-	(cond ((eq? m 'withdraw) withdraw)
-		  ((eq? m 'deposit) deposit)
-		  (else (error "Unknown request -- MAKE-ACCOUNT"
-					   m))))
+    (cond ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request -- MAKE-ACCOUNT"
+                       m))))
   dispatch)
 
 ;;; 一个累加器是一个过程，反复用数值参数调用它，就会使它的各个参数累加到一个
 ;;; 和数中。每次调用时累加器将返回当前的累加和。 (ex3.1)
 (define (make-accumulator initial)
   (lambda (addend)
-	(set! initial (+ initial addend))
-	initial))
+    (set! initial (+ initial addend))
+    initial))
 
 ;;; make-monitored 过程，以一个过程 f 作为输入，该过程本身有一个输入。
 ;;; make-monitored 返回的结果是第三个过程，比如 mf，它将用一个内部计数器维持着
@@ -68,30 +68,30 @@
   (let ((counter 0))
     (lambda (e)
       (define (dispatch m)
-		(cond ((eq? m 'how-many-calls?) counter)
-			  ((eq? m 'reset-count) (set! counter 0) counter)
-			  (else (begin (set! counter (+ counter 1))
-						   (func m)))))
-	  (dispatch e))))
+        (cond ((eq? m 'how-many-calls?) counter)
+              ((eq? m 'reset-count) (set! counter 0) counter)
+              (else (begin (set! counter (+ counter 1))
+                           (func m)))))
+      (dispatch e))))
 
 ;;; 修改 make-account 过程，使它能创建一种带密码保护的账户。 (ex3.3)
 (define (make-account-pw balance secret-password)
   (define (withdraw amount)
-	(if (>= balance amount)
-	  (begin (set! balance (- balance amount))
-			 balance)
-	  "Insufficient funds"))
+    (if (>= balance amount)
+      (begin (set! balance (- balance amount))
+             balance)
+      "Insufficient funds"))
   (define (deposit amount)
-	(set! balance (+ balance amount))
-	balance)
+    (set! balance (+ balance amount))
+    balance)
   (define show-incorrect-password
-	(lambda (e)
-	  "Incorrect password"))
+    (lambda (e)
+      "Incorrect password"))
   (define (dispatch my-password m)
-	(cond ((not (eq? secret-password my-password)) show-incorrect-password)
-	      ((eq? m 'withdraw) withdraw)
-		  ((eq? m 'deposit) deposit)
-		  (else (error "Unknown request -- MAKE-ACCOUNT-PW" m))))
+    (cond ((not (eq? secret-password my-password)) show-incorrect-password)
+          ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request -- MAKE-ACCOUNT-PW" m))))
   dispatch)
 
 ;;; 修改 ex3.3 中的 make-account-pw，加上一个局部状态变量，使得如果一个账户被用
@@ -99,31 +99,31 @@
 (define (make-account-pw-7 balance secret-password)
 (let ((counter 7))
   (define (withdraw amount)
-	(if (>= balance amount)
-	  (begin (set! balance (- balance amount))
-			 balance)
-	  "Insufficient funds"))
+    (if (>= balance amount)
+      (begin (set! balance (- balance amount))
+             balance)
+      "Insufficient funds"))
   (define (deposit amount)
-	(set! balance (+ balance amount))
-	balance)
+    (set! balance (+ balance amount))
+    balance)
   (define check-password
-	(lambda (my-password)
-	  (if (eq? secret-password my-password)
-		(begin (set! counter 7)
-			   #t)
-		(begin (set! counter (- counter 1))
-			   (if (= counter 0) (call-the-cops))
-			   #f))))
+    (lambda (my-password)
+      (if (eq? secret-password my-password)
+        (begin (set! counter 7)
+               #t)
+        (begin (set! counter (- counter 1))
+               (if (= counter 0) (call-the-cops))
+               #f))))
   (define (call-the-cops)
-	(print "Call the cops"))
+    (print "Call the cops"))
   (define show-incorrect-password
-	(lambda (e)
-	  "Incorrect password"))
+    (lambda (e)
+      "Incorrect password"))
   (define (dispatch my-password m)
-	(cond ((not (check-password my-password)) show-incorrect-password)
-	      ((eq? m 'withdraw) withdraw)
-		  ((eq? m 'deposit) deposit)
-		  (else (error "Unknown request -- MAKE-ACCOUNT-PW-7" m))))
+    (cond ((not (check-password my-password)) show-incorrect-password)
+          ((eq? m 'withdraw) withdraw)
+          ((eq? m 'deposit) deposit)
+          (else (error "Unknown request -- MAKE-ACCOUNT-PW-7" m))))
   dispatch))
 
 ;;; 3.1.2 引进赋值带来的利益
@@ -131,16 +131,16 @@
 ;;; 随机数生成，用线性同余方法（LCG），N(j+1) = (A * N(j) + C) mod M
 (define rand-update
   (let ((a 27)
-		(b 26)
-		(m 127))
-	(lambda (x)
-	  (remainder (+ (* a x) b) m))))
+        (b 26)
+        (m 127))
+    (lambda (x)
+      (remainder (+ (* a x) b) m))))
 
 (define rand
   (let ((x 3))
-	(lambda ()
-	  (set! x (rand-update x))
-	  x)))
+    (lambda ()
+      (set! x (rand-update x))
+      x)))
 
 ;;; 蒙特卡罗模拟，随机数实现
 (define (estimate-pi trials)
@@ -151,12 +151,12 @@
 
 (define (monte-carlo trials experiment)
   (define (iter trials-remaining trials-passed)
-	(cond ((= trials-remaining 0)
-		   (/ trials-passed trials))
-		  ((experiment)
-		   (iter (- trials-remaining 1) (+ trials-passed 1)))
-		  (else
-			(iter (- trials-remaining 1) trials-passed))))
+    (cond ((= trials-remaining 0)
+           (/ trials-passed trials))
+          ((experiment)
+           (iter (- trials-remaining 1) (+ trials-passed 1)))
+          (else
+            (iter (- trials-remaining 1) trials-passed))))
   (iter trials 0))
 
 ;;; 蒙特卡罗积分，通过蒙特卡罗模拟估计定积分值 (ex3.5)
@@ -164,15 +164,15 @@
   (abs (* (- x2 x1) (- y2 y1))))
 (define (random-in-range low high)
   (let ((range (- high low)))
-	(+ low (random range))))
+    (+ low (random range))))
 (define (unit-pred x y)
   (<= (+ (square x) (square y)) 1))
 (define (estimate-integral P x1 x2 y1 y2 trials)
   (let ((integral-test
-		  (lambda ()
-			(P (random-in-range x1 x2)
-			   (random-in-range y1 y2)))))
-	(* (rect-area x1 x2 y1 y2) (monte-carlo trials integral-test))))
+          (lambda ()
+            (P (random-in-range x1 x2)
+               (random-in-range y1 y2)))))
+    (* (rect-area x1 x2 y1 y2) (monte-carlo trials integral-test))))
 
 ;;; 用 estimate-integral 估算 pi
 (define estimate-integral-pi
@@ -182,48 +182,48 @@
 ;;; ((rand 'reset) <new-value>) 将内部状态变量设置为 <new-value> (ex3.6)
 (define rand-ex
   (let ((x 3))
-	(define generate
-	  (lambda ()
-		(set! x (rand-update x))
-	    x))
-	(define reset
-	  (lambda (new-value)
-		(set! x new-value)))
-	(define dispatch
-	  (lambda (m)
-	    (cond ((eq? m 'generate) (generate))
-			  ((eq? m 'reset) reset)
-			  (else (error "Unknown request -- RAND-EX"
-						   m)))))
-	dispatch))
+    (define generate
+      (lambda ()
+        (set! x (rand-update x))
+        x))
+    (define reset
+      (lambda (new-value)
+        (set! x new-value)))
+    (define dispatch
+      (lambda (m)
+        (cond ((eq? m 'generate) (generate))
+              ((eq? m 'reset) reset)
+              (else (error "Unknown request -- RAND-EX"
+                           m)))))
+    dispatch))
 
 ;;; make-joint 由三个参数：1. 有密码保护的账户，2. 原密码， 3. 新密码，可以用
 ;;; 新密码对账户进行访问。
 ;;; 如 peter-acc 是一个具有密码 open-sesame 的银行账户，那么
 ;;; (define paul-acc
-;;;		(make-joint peter-acc 'open-sesame 'rosebud))
-;;;	将使我们可以通过名字 paul-ac 和密码 rosebud 对账户 peter-acc 做现金交易。
-;;;	(ex3.7)
+;;;     (make-joint peter-acc 'open-sesame 'rosebud))
+;;; 将使我们可以通过名字 paul-ac 和密码 rosebud 对账户 peter-acc 做现金交易。
+;;; (ex3.7)
 (define make-joint
   (lambda (acc acc-pass new-pass)
-	(define (proxy-dispatch password m)
-	  (if (eq? password new-pass)
-		(acc acc-pass m)
-		(error "Wrong joint password -- MAKE-JOINT" password)))
-	proxy-dispatch))
+    (define (proxy-dispatch password m)
+      (if (eq? password new-pass)
+        (acc acc-pass m)
+        (error "Wrong joint password -- MAKE-JOINT" password)))
+    proxy-dispatch))
 
 ;;; 当我们引入赋值之后，对一个过程的各个参数的求值顺序不同就可能导致不同的结果。
 ;;; 定义一个简单的过程，使得对于 (+ (f 0) (f 1)) 的求值在对实际参数采用从左到右
 ;;; 的求值顺序式返回 0, 而对实际参数采用从右到左的求值顺序时返回 1。 (ex3.8)
 (define f
   (lambda (x)
-	(let ((xx 0)
-		  (already-run? #f))
-	  (if already-run?
-		0
-		(begin (set! xx x)
-			   (set! already-run? #t)
-			   xx)))))
+    (let ((xx 0)
+          (already-run? #f))
+      (if already-run?
+        0
+        (begin (set! xx x)
+               (set! already-run? #t)
+               xx)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -237,9 +237,9 @@
 ;;; get-new-pair 实现。
 ;(define (cons x y)
 ;  (let ((new (get-new-pair)))
-;	(set-car! new x)
-;	(set-cdr! new y)
-;	new))
+;   (set-car! new x)
+;   (set-cdr! new y)
+;   new))
 
 ;;; 过程 append!，与 append 类似，但它是一个改变函数而不是一个构造函数。
 ;;; 它将表拼接起来的方式是将两个表粘起来，修改 x 的最后一个序对，使它的
@@ -250,8 +250,8 @@
 
 (define (last-pair x)
   (if (null? (cdr x))
-	x
-	(last-pair (cdr x))))
+    x
+    (last-pair (cdr x))))
 
 ;;; 过程 make-cycle，构造循环（链表）。 (ex3.13)
 (define (make-cycle x)
@@ -261,11 +261,11 @@
 ;;; 过程 mystery，(ex3.14)
 (define (mystery x)
   (define (loop x y)
-	(if (null? x)
-	  y
-	  (let ((temp (cdr x)))
-		(set-cdr! x y)
-		(loop temp x))))
+    (if (null? x)
+      y
+      (let ((temp (cdr x)))
+        (set-cdr! x y)
+        (loop temp x))))
   (loop x '()))
 
 ;;; 共享和相等
@@ -281,10 +281,10 @@
 ;;; 有问题的 count-pairs (ex3.16)
 (define (count-pairs x)
   (if (not (pair? x))
-	0
-	(+ (count-pairs (car x))
-	   (count-pairs (cdr x))
-	   1)))
+    0
+    (+ (count-pairs (car x))
+       (count-pairs (cdr x))
+       1)))
 (define cons1
   (cons 1 1))
 (define cons2
@@ -308,47 +308,48 @@
 ;;; 注意遍历的写法
 (define (get-travelled-pairs pairs memo-list)
   (if (or (not (pair? pairs)) (memq pairs memo-list))
-	memo-list 
-	(get-travelled-pairs (car pairs)
-						 (get-travelled-pairs (cdr pairs) (cons pairs memo-list)))))
+    memo-list 
+    (get-travelled-pairs (car pairs)
+                         (get-travelled-pairs (cdr pairs) (cons pairs memo-list)))))
 (define (new-count-pairs x)
   (length (get-travelled-pairs x '())))
 
-;;; 写一个过程检查一个表，确定其中是否包含环，即，如果某个程序打算通过不断做 cdr 去找到这个表的结尾，是否会陷入无穷循环。 (ex3.18)
+;;; 写一个过程检查一个表，确定其中是否包含环，即，如果某个程序打算通过不断做
+;;; cdr 去找到这个表的结尾，是否会陷入无穷循环。 (ex3.18)
 (define (check-list-ring pairs)
   (define (check-list-ring-iter pairs memo-list)
     (if (not (pair? pairs))
-	  #f
-	  (if (memq pairs memo-list)
-		#t
-		(check-list-ring-iter (cdr pairs) (cons pairs memo-list)))))
+      #f
+      (if (memq pairs memo-list)
+        #t
+        (check-list-ring-iter (cdr pairs) (cons pairs memo-list)))))
   (check-list-ring-iter pairs '()))
 
 ;;; 重写上面的算法，只需要常量空间 (ex3.19)
 (define (check-list-ring-smart pairs)
   (define (step-walk pairs step)
-	(if (or (< step 1) (eq? pairs '()))
-	  pairs
-	  (step-walk (cdr pairs) (- step 1))))
+    (if (or (< step 1) (eq? pairs '()))
+      pairs
+      (step-walk (cdr pairs) (- step 1))))
   (define (check-list-ring-smart-iter pairs1 pairs2)
     (if (or (eq? pairs1 '()) (eq? pairs2 '()))
-  	  #f
-	  (if (eq? pairs1 pairs2)
-	    #t
-	    (check-list-ring-smart-iter (step-walk pairs1 1) (step-walk pairs2 2)))))
+      #f
+      (if (eq? pairs1 pairs2)
+        #t
+        (check-list-ring-smart-iter (step-walk pairs1 1) (step-walk pairs2 2)))))
   (check-list-ring-smart-iter (step-walk pairs 1) (step-walk pairs 2)))
-	
+    
 ;;; 改变也是赋值
 ;;; 自定义 cons 系列操作
 ; (define (cons x y)
 ;   (define (set-x! v) (set! x v))
 ;   (define (set-y! v) (set! y v))
 ;   (define (dispatch m)
-; 	(cond ((eq? m 'car) x)
-; 		  ((eq? m 'cdr) y)
-; 		  ((eq? m 'set-car!) set-x!)
-; 		  ((eq? m 'set-cdr!) set-y!)
-; 		  (else (error "Undefined operation -- CONS" m))))
+;   (cond ((eq? m 'car) x)
+;         ((eq? m 'cdr) y)
+;         ((eq? m 'set-car!) set-x!)
+;         ((eq? m 'set-cdr!) set-y!)
+;         (else (error "Undefined operation -- CONS" m))))
 ;   dispatch)
 ; (define (car z) (z 'car))
 ; (define (cdr z) (z 'cdr))
@@ -376,59 +377,59 @@
 ;;; 选取队列前端的数据项时，返回由前端指针指向的序对的 car
 (define (front-queue queue)
   (if (empty-queue? queue)
-	(error "FRONT called with an empty queue" queue)
-	(car (front-ptr queue))))
+    (error "FRONT called with an empty queue" queue)
+    (car (front-ptr queue))))
 ;;; 向队列中插入一个数据项，我们首先创建一个新序对，其 car 是需要插入的
 ;;; 数据项，其 cdr 是空表。如果这一队列原来就是空的，那么就让队列的前端
 ;;; 指针和后端指针指向这个新序对。否则就修改队列中最后一个序对，使之指向
 ;;; 这个新序对，而后让队列的后端指针也指向这个新序对。
 (define (insert-queue! queue item)
   (let ((new-pair (cons item '())))
-	(cond ((empty-queue? queue)
-		   (set-front-ptr! queue new-pair)
-		   (set-rear-ptr! queue new-pair)
-		   queue)
-		  (else
-			(set-cdr! (rear-ptr queue) new-pair)
-			(set-rear-ptr! queue new-pair)
-			queue))))
+    (cond ((empty-queue? queue)
+           (set-front-ptr! queue new-pair)
+           (set-rear-ptr! queue new-pair)
+           queue)
+          (else
+            (set-cdr! (rear-ptr queue) new-pair)
+            (set-rear-ptr! queue new-pair)
+            queue))))
 ;;; 要从队列的前端删除一个数据项，只需修改队列的前端指针，使它指向队列中
 ;;; 的第二个数据项。通过队列中第一项的 cdr 指针可以找到这个项。
 (define (delete-queue! queue)
   (cond ((empty-queue? queue)
-		 (error "DELETE! called with an empty queue" queue))
-		(else
-		  (set-front-ptr! queue (cdr (front-ptr queue)))
-		  queue)))
+         (error "DELETE! called with an empty queue" queue))
+        (else
+          (set-front-ptr! queue (cdr (front-ptr queue)))
+          queue)))
 
 ;;; 定义一个 print-queue，以队列为输入，打印出队列里的数据项序列。 (ex3.21)
 (define (print-queue queue)
   (define (print-queue-iter queue-item)
-	(if (not (null? (car queue-item)))
-	  (begin (display (car queue-item))
-			 (display " ")
-			 (if (not (null? (cdr queue-item)))
-			   (print-queue-iter (cdr queue-item))
-			   (display '())))))
+    (if (not (null? (car queue-item)))
+      (begin (display (car queue-item))
+             (display " ")
+             (if (not (null? (cdr queue-item)))
+               (print-queue-iter (cdr queue-item))
+               (display '())))))
   (cond ((empty-queue? queue)
-		 (print '()))
-		(else
-		  (print-queue-iter (front-ptr queue))
-		  (display "\n"))))
-		   
+         (print '()))
+        (else
+          (print-queue-iter (front-ptr queue))
+          (display "\n"))))
+           
 ;;; 除了用一对指针表示队列外，我们也可以将队列构造成一个带有局部状态的
 ;;; 过程。这里的局部状态由指向一个常规表的开始和结束指针组成。 (ex3.22)
 (define (make-queue)
   (let ((front-ptr '())
-		(rear-ptr '()))
-	(define (set-front-ptr! item) (set! front-ptr item))
-	(define (set-rear-ptr! item) (set! rear-ptr item))
-	(define (dispatch m)
-	  (cond ((eq? m 'front-ptr) front-ptr)
-			((eq? m 'rear-ptr) rear-ptr)
-			((eq? m 'set-front-ptr!) set-front-ptr!)
-			((eq? m 'set-rear-ptr!) set-rear-ptr!)))
-	dispatch))
+        (rear-ptr '()))
+    (define (set-front-ptr! item) (set! front-ptr item))
+    (define (set-rear-ptr! item) (set! rear-ptr item))
+    (define (dispatch m)
+      (cond ((eq? m 'front-ptr) front-ptr)
+            ((eq? m 'rear-ptr) rear-ptr)
+            ((eq? m 'set-front-ptr!) set-front-ptr!)
+            ((eq? m 'set-rear-ptr!) set-rear-ptr!)))
+    dispatch))
 (define (front-ptr queue)
   (queue 'front-ptr))
 (define (rear-ptr queue)
@@ -444,14 +445,14 @@
 ;;; 所有操作在 O(1) 内完成。 (ex3.23)
 (define (make-deque)
   (let ((front-ptr '())
-		(rear-ptr '()))
-	(define (set-front-ptr! item) (set! front-ptr item))
-	(define (set-rear-ptr! item) (set! rear-ptr item))
-	(define (dispatch m)
-	  (cond ((eq? m 'front-ptr) front-ptr)
-			((eq? m 'rear-ptr) rear-ptr)
-			((eq? m 'set-front-ptr!) set-front-ptr!)
-			((eq? m 'set-rear-ptr!) set-rear-ptr!)))
+        (rear-ptr '()))
+    (define (set-front-ptr! item) (set! front-ptr item))
+    (define (set-rear-ptr! item) (set! rear-ptr item))
+    (define (dispatch m)
+      (cond ((eq? m 'front-ptr) front-ptr)
+            ((eq? m 'rear-ptr) rear-ptr)
+            ((eq? m 'set-front-ptr!) set-front-ptr!)
+            ((eq? m 'set-rear-ptr!) set-rear-ptr!)))
   dispatch))
 (define (front-ptr deque)
   (deque 'front-ptr))
@@ -466,12 +467,12 @@
   (null? (front-ptr deque)))
 (define (front-deque deque)
   (if (empty-deque? deque)
-	(error "FRONT called with an empty deque" deque)
-	(car (front-ptr deque))))
+    (error "FRONT called with an empty deque" deque)
+    (car (front-ptr deque))))
 (define (rear-deque deque)
   (if (empty-deque? deque)
-	(error "REAR called with an empty deque" deque)
-	(car (rear-ptr deque))))
+    (error "REAR called with an empty deque" deque)
+    (car (rear-ptr deque))))
 
 (define (item pair)
   (car pair))
@@ -486,60 +487,154 @@
 
 (define (front-insert-deque! deque item)
   (let ((new-pair (list item '() '())))
-	(cond ((empty-deque? deque)
-		   (set-front-ptr! deque new-pair)
-		   (set-rear-ptr! deque new-pair)
-		   deque)
-		  (else
-			(set-next-ptr! new-pair (front-ptr deque))
-			(set-prev-ptr! (front-ptr deque) new-pair)
-			(set-front-ptr! deque new-pair)
-			deque))))
+    (cond ((empty-deque? deque)
+           (set-front-ptr! deque new-pair)
+           (set-rear-ptr! deque new-pair)
+           deque)
+          (else
+            (set-next-ptr! new-pair (front-ptr deque))
+            (set-prev-ptr! (front-ptr deque) new-pair)
+            (set-front-ptr! deque new-pair)
+            deque))))
 (define (rear-insert-deque! deque item)
   (let ((new-pair (list item '() '())))
-	(cond ((empty-deque? deque)
-		   (set-front-ptr! deque new-pair)
-		   (set-rear-ptr! deque new-pair)
-		   deque)
-		  (else
-			(set-prev-ptr! new-pair (rear-ptr deque))
-			(set-next-ptr! (rear-ptr deque) new-pair)
-			(set-rear-ptr! deque new-pair)
-			deque))))
+    (cond ((empty-deque? deque)
+           (set-front-ptr! deque new-pair)
+           (set-rear-ptr! deque new-pair)
+           deque)
+          (else
+            (set-prev-ptr! new-pair (rear-ptr deque))
+            (set-next-ptr! (rear-ptr deque) new-pair)
+            (set-rear-ptr! deque new-pair)
+            deque))))
 (define (front-delete-deque! deque)
   (cond ((empty-deque? deque)
-		 (error "FRONT-DELETE! called with an empty deque" deque))
-		(else
-		  (set-prev-ptr! (next-ptr (front-ptr deque)) '())
-		  (set-front-ptr! deque (next-ptr (front-ptr deque)))
-		  deque)))
+         (error "FRONT-DELETE! called with an empty deque" deque))
+        (else
+          (set-prev-ptr! (next-ptr (front-ptr deque)) '())
+          (set-front-ptr! deque (next-ptr (front-ptr deque)))
+          deque)))
 (define (rear-delete-deque! deque)
   (cond ((empty-deque? deque)
-		 (error "REAR-DELETE! called with an empty deque" deque))
-		(else
-		  (set-next-ptr! (prev-ptr (rear-ptr deque)) '())
-		  (set-rear-ptr! deque (prev-ptr (rear-ptr deque)))
-		  deque)))
+         (error "REAR-DELETE! called with an empty deque" deque))
+        (else
+          (set-next-ptr! (prev-ptr (rear-ptr deque)) '())
+          (set-rear-ptr! deque (prev-ptr (rear-ptr deque)))
+          deque)))
 ;;; 打印双端队列
 (define (print-deque deque)
   (define (print-deque-iter deque-item)
-	(if (not (null? (item deque-item)))
-	  (begin (display (item deque-item))
-			 (display " ")
-			 (if (not (null? (next-ptr deque-item)))
-			   (print-deque-iter (next-ptr deque-item))
-			   (display '())))))
+    (if (not (null? (item deque-item)))
+      (begin (display (item deque-item))
+             (display " ")
+             (if (not (null? (next-ptr deque-item)))
+               (print-deque-iter (next-ptr deque-item))
+               (display '())))))
   (cond ((empty-deque? deque)
-		 (print '()))
-		(else
-		  (print-deque-iter (front-ptr deque))
-		  (display "\n"))))
+         (print '()))
+        (else
+          (print-deque-iter (front-ptr deque))
+          (display "\n"))))
 
+;;; 3.3.3 表格的表示
+;;;
+;;; 从表格里提取信息，用 lookup 过程，它以一个关键码为参数，返回与之相
+;;; 关联的值（如果在这个关键码之下没有值就返回假）。lookup 基于 assoc
+;;; 操作定义的，这一操作要求一个关键码和一个记录的表作为参数。
+(define (lookup key table)
+  (let ((record (assoc key (cdr table))))
+    (if record
+      (cdr record)
+      #f)))
+(define (assoc key records)
+  (cond ((null? records) #f)
+        ((equal? key (caar records)) (car records))
+        (else (assoc key (cdr records)))))
+;;; 在一个表格里某个特定的关键码之下插入一个值，首先用 assoc 查看该表格
+;;; 里是否已经有以此作为关键码的记录。如果没有就 cons 起这个关键码和相应
+;;; 的值，构造出一个新纪录，插入到记录表的最前面。如果已经有了具有该关键
+;;; 码的记录，就将该记录的 cdr 设置为新值。
+(define (insert! key value table)
+  (let ((record (assoc key (cdr table))))
+    (if record
+      (set-cdr! record value)
+      (set-cdr! table
+                (cons (cons key value) (cdr table)))))
+  'ok)
+;;; 构造一个新表格时，只需要创建起一个包含符号 *table* 的表
+(define (make-table)
+  (list '*table*))
 
-	  
+;;; 二维表格
+;;; 二维表格里每个值由两个关键码索引。我们将这种表格构造成一个一位表格，
+;;; 其中的每个关键码又标识了一个子表格。
+;;; 子表格并不需要特殊的头单元符号，因为标识子表格的关键码就能起到这一
+;;; 作用。
+;;;
+;;; 在需要查找一个数据项时，我们先用第一个关键码确定对应的子表格，而后
+;;; 用第二个关键码在这个子表格里确定记录。
+(define (lookup-2d key-1 key-2 table)
+  (let ((subtable (assoc key-1 (cdr table))))
+    (if subtable
+      (let ((record (assoc key-2 (cdr subtable))))
+        (if record
+          (cdr record)
+          #f))
+      #f)))
+;;; 如果需要将一个新数据项插入到一对关键码下，我们首先用 assoc 去查看在
+;;; 第一个关键码下是否存在一个子表格。如果没有，那么就构造起一个新的
+;;; 子表格，其中只包含一个记录 (key-2, value)，并插入到表格的第一个关键码
+;;; 之下。如果表格里已经有了对应于第一个关键码的子表格，那么就将新值插入
+;;; 该子表格，用的就是在一维表格中插入的方法。
+(define (insert!-2d key-1 key-2 value table)
+  (let ((subtable (assoc key-1 (cdr table))))
+    (if subtable
+      (let ((record (assoc key-2 (cdr subtable))))
+        (if record
+          (set-cdr! record value)
+          (set-cdr! subtable
+                    (cons (cons key-2 value)
+                          (cdr subtable)))))
+      (set-cdr! table
+                (cons (list key-1
+                            (cons key-2 value))
+                      (cdr table)))))
+  'ok)
 
+;;; 创建局部表格。
+;;; 用过程的方式表示表格，将表格表示为一个以局部状态的方式维持着一个
+;;; 内部表格的对象。在接到一个适当的消息时，这种“表格对象“将提供相应
+;;; 的过程，实现对内部表格的各种操作。
+(define (make-table-2d)
+  (let ((local-table (list '*table*)))
+    (define (lookup-2d key-1 key-2 table)
+      (let ((subtable (assoc key-1 (cdr table))))
+        (if subtable
+          (let ((record (assoc key-2 (cdr subtable))))
+            (if record
+              (cdr record)
+              #f))
+          #f)))
+    (define (insert-2d! key-1 key-2 value table)
+      (let ((subtable (assoc key-1 (cdr table))))
+        (if subtable
+          (let ((record (assoc key-2 (cdr subtable))))
+            (if record
+              (set-cdr! record value)
+              (set-cdr! subtable
+                        (cons (cons key-2 value)
+                              (cdr subtable)))))
+          (set-cdr! table
+                    (cons (list key-1
+                                (cons key-2 value))
+                          (cdr table)))))
+      'ok)
+    (define (dispatch m)
+      (cond ((eq? m 'lookup-2d-proc) lookup-2d)
+            ((eq? m 'insert-2d-proc!) insert-2d!)
+            (else (error "Unknown operation -- TABLE" m))))
+    dispatch))
 
-
-
-
-
+(define operation-table (make-table-2d))
+(define get (operation-table 'lookup-2d-proc))
+(define put (operation-table 'insert-2d-proc!))

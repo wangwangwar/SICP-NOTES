@@ -189,3 +189,13 @@
 (rear-delete-deque! d2)
 (print-deque d2)
 (print "------------ END  rear-insert-deque! -----------")
+
+(print "------------ TEST table ------------------------")
+(define t (make-table))
+(insert! 'a 1 t)
+(insert! 'b 2 t)
+(insert! 'c 3 t)
+(insert! 'b 20 t)
+(print (lookup 'b t))
+(print (lookup 'z t))
+(print "------------ END  table ------------------------")

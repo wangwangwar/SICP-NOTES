@@ -885,7 +885,10 @@
 						  (copy-to-list (right-child tree)
 										result-list)))))
   (copy-to-list tree '()))
-;;; list->tree 将一个有序表变换为一棵平衡二叉树。其中的辅助函数 partial-tree 以整数 n 和一个至少包含 n 个元素的表为参数，构造出一棵包含这个表的前 n 个元素的平衡树。由 partial-tree 返回的结果是一个序对（由 cons 构造），其 car 是构造出的树，其 cdr 是没有包含在树中那些元素的表。 (ex2.64)
+;;; list->tree 将一个有序表变换为一棵平衡二叉树。其中的辅助函数 partial-tree
+;;; 以整数 n 和一个至少包含 n 个元素的表为参数，构造出一棵包含这个表的前 n
+;;; 个元素的平衡树。由 partial-tree 返回的结果是一个序对（由 cons 构造），其
+;;; car 是构造出的树，其 cdr 是没有包含在树中那些元素的表。 (ex2.64)
 (define (list->tree elements)
   (car (partial-tree elements (length elements))))
 (define (partial-tree elts n)
@@ -903,7 +906,8 @@
 				  (remaining-elts (cdr right-result)))
 			  (cons (make-tree this-entry left-tree right-tree)
 					remaining-elts))))))))
-;;; 利用 ex2.63 和 ex2.64 的结果，给出对采用（平衡）二叉树方式实现的集合的 union-tree-set 和 intersection-tree-set 操作的 O(n) 实现。 (ex2.65)
+;;; 利用 ex2.63 和 ex2.64 的结果，给出对采用（平衡）二叉树方式实现的集合的
+;;; union-tree-set 和 intersection-tree-set 操作的 O(n) 实现。 (ex2.65)
 (define (union-tree-set tree-set1 tree-set2)
   (list->tree (union-ordered-set (tree->list-2 tree-set1)
 								 (tree->list-2 tree-set2))))
@@ -914,14 +918,17 @@
 ;;; 2.3.4 实例：Huffman 编码树
 ;;;
 ;;; Huffman 树的表示
-;;; 叶结点！将一棵树的树叶表示为包含符号 leaf、叶中符号和权重的表
+;;; 叶结点！将一棵树的树叶表示为包含符号 leaf、叶中
+;;; 符号和权重的表
 (define (make-leaf symbol weight)
   (list 'leaf symbol weight))
 (define (leaf? object)
   (eq? (car object) 'leaf))
 (define (symbol-leaf x) (cadr x))
 (define (weight-leaf x) (caddr x))
-;;; 内部结点（树）！归并两个结点做出一棵树时，树的权重也就是这两个结点的权重之和，其符号集就是两个结点的符号集的并集。
+;;; 内部结点（树）！归并两个结点做出一棵树时，树
+;;; 的权重也就是这两个结点的权重之和，其符号集就是
+;;; 两个结点的符号集的并集。
 (define (make-code-tree left right)
   (list left
 		right
@@ -953,7 +960,8 @@
 				(decode-1 (cdr bits) tree))
 		  (decode-1 (cdr bits) next-branch)))))
   (decode-1 bits tree))
-;;; 带权重元素的集合，将树叶和树的集合表示为一批元素的表，按照权重的上升顺序排列表中的元素。
+;;; 带权重元素的集合，将树叶和树的集合表示为一批元素的表，按照权重的
+;;; 上升顺序排列表中的元素。
 (define (adjoin-weight-set x set)
   (cond ((null? set) (list x))
 		((< (weight x) (weight (car set))) (cons x set))
@@ -961,7 +969,8 @@
 					(adjoin-weight-set x (cdr set))))))
 (define (get-min-elements set)
   (car set))
-;;; 此过程以一个符号-权重对偶的表为参数，如 ((A 4) (B 2) (C 1) (D 1))，它构造出的树叶的初始排序集合，以便 Huffman 算法能够去做归并
+;;; 此过程以一个符号-权重对偶的表为参数，如 ((A 4) (B 2) (C 1) (D
+;;; 1))，它构造出的树叶的初始排序集合，以便 Huffman 算法能够去做归并
 (define (make-leaf-set pairs)
   (if (null? pairs)
 	'()
@@ -1005,7 +1014,12 @@
 		(cons 1 (encode-symbol symbol (right-branch tree)))))
 	(error "symbol not in the branch!" symbol)))
 
-;;; 下面过程以一个符号-频度（权重）对偶表为参数（其中没有任何符号出现在多于一个对偶中），并根据 Huffman 算法生成出 Huffman 编码树。其中 make-leaf-set 是前面给出的过程，它将对偶表变换为叶的有序集， successive-merge 是需要你写的过程，它使用 make-code-tree 反复归并集合中具有最小权重的元素直至集合里只剩下一个元素为止。这个元素就是我们所需要的 Huffman 树。 (ex2.69)
+;;; 下面过程以一个符号-频度（权重）对偶表为参数（其中没有任何符号出现在多于一个对偶中），并根据
+;;; Huffman 算法生成出 Huffman 编码树。其中 make-leaf-set
+;;; 是前面给出的过程，它将对偶表变换为叶的有序集， successive-merge
+;;; 是需要你写的过程，它使用 make-code-tree
+;;; 反复归并集合中具有最小权重的元素直至集合里只剩下一个元素为止。这个元素就是我们所需要的
+;;; Huffman 树。 (ex2.69)
 (define (generate-huffman-tree pairs)
   (successive-merge (make-leaf-set pairs)))
 (define (successive-merge leaf-set)
@@ -1023,14 +1037,16 @@
 ;;; YIP		9
 ;;; JOB		2
 ;;; WAH		1
-;;; 用 generate-huffman-tree 过程生成对应的 Huffman 树，用 encode 过程编码下面的消息：
+;;; 用 generate-huffman-tree 过程生成对应的 Huffman 树，用 encode
+;;; 过程编码下面的消息：
 ;;; get a job
 ;;; sha na na na na na na na na
 ;;; get a job
 ;;; sha na na na na na na na na
 ;;; wah yip yip yip yip yip yip yip yip
 ;;; sha boom
-;;; 这一编码需要多少个二进制位？如果对这 8 个符号的字母表采用定长编码，完成这个歌曲的编码最少需要多少个二进制位？
+;;; 这一编码需要多少个二进制位？如果对这 8
+;;; 个符号的字母表采用定长编码，完成这个歌曲的编码最少需要多少个二进制位？
 (define my-pairs 
   '((a 2) (na 16) (boom 1) (sha 3) (get 2) (yip 9) (job 2) (wah 1)))
 (define my-huffman-tree
