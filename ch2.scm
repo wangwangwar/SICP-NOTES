@@ -598,6 +598,31 @@
 		((eq? item (car x)) x)
 		(else (memq item (cdr x)))))
 
+;;; 打印什么 (ex2.53)
+(print "---------- TEST memq -------------------------")
+(print (list 'a 'b 'c))
+(print (list (list 'george)))
+(print (cdr '((x1 x2) (y1 y2))))
+(print (cadr '((x1 x2) (y1 y2))))
+(print (pair? (car '(a short list))))
+(print (memq 'red '((red shoes) (blue socks))))
+(print (memq 'red '(red shoes blue socks)))
+(print "---------- END  memq -------------------------")
+
+;;; 定义过程 equal? (ex2.54)
+(define (equal? item-1 item-2)
+  (cond ((and (symbol? item-1) (symbol? item-2))
+         (eq? item-1 item-2))
+        ((and (number? item-1) (number? item-2))
+         (eq? item-1 item-2))
+        ((and (null? item-1) (null? item-2))
+         #t)
+        ((and (pair? item-1) (pair? item-2))
+         (and (equal? (car item-1) (car item-2))
+              (equal? (cdr item-1) (cdr item-2))))
+        (else
+          #f)))
+  
 ;;; 2.3.2 实例：符号求导
 ;;;
 ;;; 代数表达式的实现

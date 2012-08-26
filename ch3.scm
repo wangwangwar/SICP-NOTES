@@ -607,16 +607,16 @@
 ;;; 的过程，实现对内部表格的各种操作。
 (define (make-table-2d)
   (let ((local-table (list '*table*)))
-    (define (lookup-2d key-1 key-2 table)
-      (let ((subtable (assoc key-1 (cdr table))))
+    (define (lookup-2d key-1 key-2)
+      (let ((subtable (assoc key-1 (cdr local-table))))
         (if subtable
           (let ((record (assoc key-2 (cdr subtable))))
             (if record
               (cdr record)
               #f))
           #f)))
-    (define (insert-2d! key-1 key-2 value table)
-      (let ((subtable (assoc key-1 (cdr table))))
+    (define (insert-2d! key-1 key-2 value)
+      (let ((subtable (assoc key-1 (cdr local-table))))
         (if subtable
           (let ((record (assoc key-2 (cdr subtable))))
             (if record
@@ -624,10 +624,10 @@
               (set-cdr! subtable
                         (cons (cons key-2 value)
                               (cdr subtable)))))
-          (set-cdr! table
+          (set-cdr! local-table
                     (cons (list key-1
                                 (cons key-2 value))
-                          (cdr table)))))
+                          (cdr local-table)))))
       'ok)
     (define (dispatch m)
       (cond ((eq? m 'lookup-2d-proc) lookup-2d)
@@ -638,3 +638,64 @@
 (define operation-table (make-table-2d))
 (define get (operation-table 'lookup-2d-proc))
 (define put (operation-table 'insert-2d-proc!))
+
+;;; 在上面的表格实现中，对于关键码的检查用 equal? 比较是否相等(它被
+;;; assoc 调用). 这一检查方式并不总是合适的。如，我们可能需要一个采用
+;;; 数值关键码的表格，对于这种表格，我们需要的不是找到对应数值的准确
+;;; 匹配，而可以是有一点容许误差的数值。设计一个表格构造函数 make-table，
+;;; 它以一个 same-key? 过程作为参数，用这个过程检查关键码的“相等”与否。
+;;;
+;;; 这里 same-key? 用 ex2.54 定义的 equal? 稍作修改，将 number 相等由
+;;; 绝对等于改为约等于，精确到小数点后两位
+;;; (ex3.24)
+(define (make-table-2d-new)
+  (let ((local-table (list '*table*)))
+    (define (same-key? item-1 item-2)
+      (cond ((and (symbol? item-1) (symbol? item-2))
+             (eq? item-1 item-2))
+            ((and (number? item-1) (number? item-2))
+             (if (< (abs (- item-1 item-2)) 0.01)
+               #t
+               #f))
+            ((and (null? item-1) (null? item-2))
+             #t)
+            ((and (pair? item-1) (pair? item-2))
+             (and (same-key? (car item-1) (car item-2))
+                  (same-key? (cdr item-1) (cdr item-2))))
+            (else
+              #f)))
+    (define (assoc key records)
+      (cond ((null? records) #f)
+            ((same-key? key (caar records)) (car records))
+            (else (assoc key (cdr records)))))
+    (define (lookup-2d key-1 key-2)
+      (let ((subtable (assoc key-1 (cdr local-table))))
+        (if subtable
+          (let ((record (assoc key-2 (cdr subtable))))
+            (if record
+              (cdr record)
+              #f))
+          #f)))
+    (define (insert-2d! key-1 key-2 value)
+      (let ((subtable (assoc key-1 (cdr local-table))))
+        (if subtable
+          (let ((record (assoc key-2 (cdr subtable))))
+            (if record
+              (set-cdr! record value)
+              (set-cdr! subtable
+                        (cons (cons key-2 value)
+                              (cdr subtable)))))
+          (set-cdr! local-table
+                    (cons (list key-1
+                                (cons key-2 value))
+                          (cdr local-table)))))
+      'ok)
+    (define (dispatch m)
+      (cond ((eq? m 'lookup-2d-proc) lookup-2d)
+            ((eq? m 'insert-2d-proc!) insert-2d!)
+            (else (error "Unknown operation -- TABLE" m))))
+    dispatch))
+
+(define operation-table-new (make-table-2d-new))
+(define get-new (operation-table-new 'lookup-2d-proc))
+(define put-new (operation-table-new 'insert-2d-proc!))

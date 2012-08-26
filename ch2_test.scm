@@ -147,6 +147,26 @@
 (display (cons (cons 1 (cons 2 '())) (cons (cons 3 (cons 4 '())) '())))
 (newline)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 2.3 符号数据
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;; 2.3.1 引号
+;;;
+(print "---------- TEST memq --------------------------")
+(print (memq 'apple '(pear banana prune)))
+(print (memq 'apple '(x (apple sauce) y apple pear)))
+(print "---------- END  memq --------------------------")
+
+(print "---------- TEST equal? ------------------------")
+(print (equal? 'a 'a))
+(print (equal? 3 3))
+(print (equal? '(this is a list) '(this is a list)))
+(print (equal? '(this is a list) '(this (is a) list)))
+(print (equal? '(this 3 is sb) '(this 2 is sb)))
+(print "---------- END  equal? ------------------------")
+
 ;;; 2.3.2 实例：符号求导
 ;;;
 (print "----------- TEST deriv ------------------------")
