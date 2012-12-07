@@ -1,3 +1,5 @@
+#!/usr/bin/guile -s
+!#
 (define (identity x)
 	x)
 
@@ -13,15 +15,12 @@
 (define (inc x)
   (+ x 1))
 
-;(define (abs x)
-;  (if (< x 0) (- x) x))
-
 (define (double x)
   (* x 2.0))
 
 (define (halve x)
   (/ x 2.0))
-
+     
 (define (print x)
   (display x)
   (newline))
