@@ -68,27 +68,3 @@
     'ok))
 ;;; 或门延迟由与门和反门延迟表示出来:
 ;;; or-gate-delay = and-gate-delay + inverter-delay * 2
-
-;;; 用 n 个全加器串联组成一个*级联进位加法器*. (ex3.30)
-;;; 输入 A1, A2, A3, ..., An 与 B1, B2, B3, ..., Bn 是需要求和的两个二进制数, 
-;;; 输出和 S1, S2, S3, ..., Sn, 以及最终进位值 C.
-;;; 其中 A1 是 most-significant bit, An 是 least-significant bit.
-;;; 写出一个过程 ripple-carry-adder 生成这种电路
-;;; 这个过程共有 4 个输入, Ak, Bk, Sk, C,
-;;; 其中 Ak 是包含 A1, A2, A3, ..., An 线路的一个表, 同理 Bk, Sk 也是,
-;;; C 是最终进位线路
-(define (ripple-carry-adder list-A list-B list-S C)
-  (define (iter A B S value-of-c)
-    (if (and (null? A) (null? B) (null? S))
-      'ok
-      (let ((a (car A))
-            (b (car B))
-            (s (car S))
-            (remain-A (cdr A))
-            (remain-B (cdr B))
-            (remain-S (cdr S))
-            (c (make-wire)))
-        (set-signal! c value-of-c)
-        (full-adder a b c s C)
-        (iter remain-A remain-B remain-S (get-signal C)))))
-  (iter list-A list-B list-S (get-signal C)))
