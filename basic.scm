@@ -24,3 +24,7 @@
 (define (print x)
   (display x)
   (newline))
+
+(define (show x)
+  (print x)
+  x)
