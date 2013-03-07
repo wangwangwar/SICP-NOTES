@@ -1,5 +1,7 @@
-#!/usr/bin/guile -s
-!#
+(define true #t)
+
+(define false #f)
+
 (define (identity x)
 	x)
 
