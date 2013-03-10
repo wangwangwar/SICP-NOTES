@@ -11,8 +11,9 @@
         result))))
 
 ;;; 将表达式保存起来
-(define (delay expr)
-  (memo-proc (lambda () expr)))
+(define-syntax delay
+  (syntax-rules ()
+                ((_ x) (lambda () x))))
 
 ;;; 对表达式求值
 (define (force delayed-object)
