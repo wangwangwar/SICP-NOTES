@@ -1,3 +1,5 @@
+#!/usr/local/bin/guile
+!#
 (load "ch3-p223-stream.scm")
 
 (define s1 (cons-stream 1 (cons-stream 2 (cons-stream 3 the-empty-stream))))

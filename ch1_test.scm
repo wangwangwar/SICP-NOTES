@@ -1,3 +1,5 @@
+#!/usr/local/bin/guile
+!#
 ;;; 1.1.7 实例：采用牛顿法求平方根
 (display (sqrt 2.0))
 (newline)
